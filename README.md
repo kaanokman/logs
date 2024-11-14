@@ -36,9 +36,9 @@ Now you can go to [http://localhost:3000](http://localhost:3000) with your brows
 
 ## Details:
 - Assumes the user is on a UNIX system.
-- Ddisplays the system's available log files in the directory "/var/log".
-- Capitaliazation of keyword is ignored.
-- User cannot fetch logs without specifying at least a filename and a number of entries greater than 0.
+- Displays the system's available log files in the directory "/var/log".
+- Capitaliazation of the keyword input is ignored.
+- User can not fetch logs without specifying at least a filename and a number of entries greater than 0.
 - "Fetch Logs" button is disabled if no log files are found or if the directory does not exist.
 - Error messages are displayed under either "Available Log Files:" or "Log Output" if:
   - No log files are found in "/var/log" directory or the directory DNE.
