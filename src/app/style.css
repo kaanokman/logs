@@ -25,6 +25,10 @@
     background-color: #222;
     padding: 20px;
     overflow-y: scroll;
+    scrollbar-width: thin;
+    /* Optional: makes the scrollbar thinner */
+    scrollbar-color: #888 #f1f1f1;
+    /* Optional: custom scrollbar colors */
 }
 
 h1 {
