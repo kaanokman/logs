@@ -44,3 +44,7 @@ Now you can go to [http://localhost:3000](http://localhost:3000) with your brows
   - No log files are found in "/var/log" directory or the directory DNE.
   - File does not exist in "/var/log" directory.
   - Log file is empty.
+
+## Preview:
+<img width="1463" alt="Screenshot 2024-11-14 at 3 00 08 PM" src="https://github.com/user-attachments/assets/9c9abb3c-58ea-4bad-804f-5bcd211938c9">
+<img width="1465" alt="Screenshot 2024-11-14 at 3 01 02 PM" src="https://github.com/user-attachments/assets/2d8da52b-5f37-4e57-abae-318a3913ff4b">
