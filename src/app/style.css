@@ -40,7 +40,6 @@ h1 {
     margin-bottom: 40px;
     font-size: 30px;
     color: #fff;
-
 }
 
 h2 {
@@ -55,7 +54,6 @@ h2 {
     font-size: 20px;
     margin-bottom: 5px;
     color: #fff;
-
 }
 
 .item {
@@ -127,7 +125,6 @@ h2 {
     margin-bottom: 5px;
     color: #fff;
     font-size: 14px;
-
 }
 
 .input {
@@ -158,8 +155,6 @@ h2 {
     box-sizing: border-box;
     color: #fff;
     font-size: 14px;
-
-
 }
 
 .list {
@@ -191,5 +186,4 @@ h2 {
     overflow: scroll;
     background-color: #111;
     color: #fff;
-
 }

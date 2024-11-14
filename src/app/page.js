@@ -20,6 +20,7 @@ export default function HomePage() {
                 const response = await fetch('/api');
                 const data = await response.json();
                 setLogFiles(data.logFiles || []);
+            
             } catch (error) {
                 setError('Unable to load log files');
             }
@@ -46,6 +47,7 @@ export default function HomePage() {
                 }),
             });
 
+            // if error is returned, throw new error to be caught by frontend error handler with error data
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'An error occurred');
@@ -53,9 +55,11 @@ export default function HomePage() {
 
             const data = await response.json();
             console.log(data)
+            if (data.logs.length === 0) {setError("Log file is empty");}
             setLogs(data.logs);
 
         } catch (error) {
+
             setError(error.message);
             setLogs([]);
         }
@@ -79,7 +83,7 @@ export default function HomePage() {
                                 color: 'red'
                             }}
                         >
-                            No log files found
+                            No log files found or directory DNE
                         </p>
                         ) : (
 
