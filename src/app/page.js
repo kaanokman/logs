@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import "./style.css"
 
 export default function HomePage() {
+
+    // state variables
     const [filename, setFilename] = useState('');
     const [numEntries, setNumEntries] = useState('');
     const [keyword, setKeyword] = useState('');
@@ -11,7 +13,7 @@ export default function HomePage() {
     const [error, setError] = useState(null);
     const [logFiles, setLogFiles] = useState([]);
 
-    // Fetch the list of log files on component mount
+    // fetches all available log files to choose from upon mount
     useEffect(() => {
         async function fetchLogFiles() {
             try {
@@ -22,12 +24,15 @@ export default function HomePage() {
                 setError('Unable to load log files');
             }
         }
-
         fetchLogFiles();
     }, []);
 
+    // hanlder for fetching logs from selected file
     const handleFetchLogs = async () => {
+
+        // clear error if any
         setError(null);
+
         try {
             const response = await fetch('/api', {
                 method: 'POST',
@@ -47,10 +52,11 @@ export default function HomePage() {
             }
 
             const data = await response.json();
+            console.log(data)
             setLogs(data.logs);
-            setError(null);
-        } catch (err) {
-            setError(err.message);
+
+        } catch (error) {
+            setError(error.message);
             setLogs([]);
         }
     };
@@ -63,19 +69,32 @@ export default function HomePage() {
                 <h1>Logs Viewer</h1>
 
                 <div className="item">
-                    <h2>Available Log Files</h2>
 
-                    {logFiles.length === 0 ? (
-                        <p>No log files found</p>
-                    ) : (
-                        <ul className='list'>
-                            {logFiles.map((file) => (
-                                <li className="list-item" key={file}>
-                                    {file}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
+                    <h2> Available Log Files: </h2>
+
+                    <ul className='list'>
+                        {logFiles.length === 0 ? (
+                            <p className='list-item'
+                            style={{
+                                color: 'red'
+                            }}
+                        >
+                            No log files found
+                        </p>
+                        ) : (
+
+                        <>
+
+                        {logFiles.map((file) => (
+                            <li className="list-item" key={file}>
+                                {file}
+                            </li>
+                        ))}
+
+                        </>
+
+                        )}
+                    </ul>
                 </div>
 
                 <form className="form" onSubmit={(e) => { e.preventDefault(); handleFetchLogs(); }}>
@@ -112,7 +131,7 @@ export default function HomePage() {
                         />
                     </div>
 
-                    <button className='button' type="submit" onClick={handleFetchLogs}>Fetch Logs</button>
+                    <button className='button' disabled={logFiles.length === 0} type="submit">Fetch Logs</button>
 
                 </form>
 
@@ -124,7 +143,7 @@ export default function HomePage() {
                             color: error ? 'red' : 'inherit'
                         }}
                     >
-                        {error ? error : logs.join('\n')}
+                        {error ? error : (logs.length > 0 && logs.join('\n'))}
                     </pre>
 
                 </div>

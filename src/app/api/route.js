@@ -4,23 +4,24 @@ import path from 'path';
 
 export async function GET() {
     try {
+        // unix log directory
+        const logsDirectory = '/var/log/';
 
-        // Folder for logs in the public directory
-        const logsDirectory = path.join(process.cwd(), 'public', 'logs');
-        // const logsDirectory = '/var/log/';
-
-        // Read the contents of the 'logs' directory
+        // read contents
         const files = fs.readdirSync(logsDirectory);
 
-        // Filter out only .log files and avoid directories
+        // fetch only log files
         const logFiles = files.filter((file) => {
             const filePath = path.join(logsDirectory, file);
             return fs.statSync(filePath).isFile() && file.endsWith('.log');
         });
 
+        // return list of log files
         return NextResponse.json({ logFiles });
+
     } catch (error) {
-        console.error('Error reading log directory:', error); // Log the exact error
+
+        console.error('Error reading log directory:', error);
 
         return NextResponse.json({ error: 'Unable to list log files' }, { status: 500 });
     }
@@ -31,16 +32,20 @@ export async function POST(request) {
     try {
         const { filename, numEntries, keyword } = await request.json();
 
-        // Only allow log files within the /var/log directory
-        // const logFilePath = '/var/log/' + filename;
-        const logFilePath = path.join(process.cwd(), 'public', 'logs', filename);
+        // only allow log files within the /var/log directory
+        const logFilePath = '/var/log/' + filename;
+        // const logFilePath = path.join(process.cwd(), 'public', 'logs', filename);
 
-        // Read the file and split by lines
+        if (!fs.existsSync(logFilePath)) {
+            return NextResponse.json({ error: 'File does not exist' }, { status: 404 });
+        }
+
+        // read the file and split by lines
         const logContent = fs.readFileSync(logFilePath, 'utf-8');
 
         const lines = logContent.split('\n').filter(line => line);
 
-        // Filter by keyword and limit to the last numEntries
+        // filter by keyword and limit to the last numEntries
         const filteredLines = lines
             .filter(line => line.toLowerCase().includes(keyword.toLowerCase()))
             .slice(-numEntries)
