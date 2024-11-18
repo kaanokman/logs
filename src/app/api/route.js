@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import readline from 'readline';
 
 // get endpoint for all log files in log directory
 export async function GET() {
@@ -10,7 +11,8 @@ export async function GET() {
         const logsDirectory = '/var/log/';
 
         // get all files
-        const files = fs.readdirSync(logsDirectory);
+        // const files = fs.readdirSync(logsDirectory);
+        const files = await fs.promises.readdir(logsDirectory);
 
         // filter out non-log files
         const logFiles = files.filter((file) => {
@@ -39,7 +41,14 @@ export async function POST(request) {
         const { filename, numEntries, keyword } = await request.json();
 
         // specify directory
-        const logFilePath = '/var/log/' + filename;
+        // const logFilePath = '/var/log/' + filename;
+        const logsDirectory = '/var/log/';
+        const logFilePath = path.resolve(logsDirectory, filename);
+
+        if (!logFilePath.startsWith(logsDirectory)) {
+            return NextResponse.json({ error: 'Access to this file is restricted' }, { status: 403 });
+        }
+
         // const logFilePath = path.join(process.cwd(), 'public', 'logs', filename);
 
         // check if file exists
@@ -49,18 +58,34 @@ export async function POST(request) {
             return NextResponse.json({ error: 'File does not exist' }, { status: 404 });
         }
 
-        // read the file and split by lines
-        const logContent = fs.readFileSync(logFilePath, 'utf-8');
-        const lines = logContent.split('\n').filter(line => line);
+        // process file line by line using a "stream"
+        const stream = fs.createReadStream(logFilePath, 'utf-8');
+        const rl = readline.createInterface({ input: stream });
 
-        // filter by keyword and limit to the last numEntries
-        const filteredLines = lines
-            .filter(line => line.toLowerCase().includes(keyword.toLowerCase()))
-            .slice(-numEntries)
-            .reverse();
+        const matchingLines = [];
+        const keywordLower = keyword.toLowerCase();
 
-            // return logs
-        return NextResponse.json({ logs: filteredLines });
+        for await (const line of rl) {
+
+            if (line.trim() === '') {
+                continue;
+            }
+
+            if (keyword && !line.toLowerCase().includes(keywordLower)) {
+                continue;
+            }
+            matchingLines.push(line);
+
+            // only keep numEntries in memory to display instead of loading then filtering
+            if (matchingLines.length > numEntries) {
+                matchingLines.shift();
+            }
+        }
+
+        rl.close();
+
+        // return logs
+        return NextResponse.json({ logs: matchingLines });
 
     } catch (error) {
 

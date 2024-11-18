@@ -12,6 +12,7 @@ export default function HomePage() {
     const [logs, setLogs] = useState([]);
     const [error, setError] = useState(null);
     const [logFiles, setLogFiles] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     // fetches all available log files to choose from upon mount
     useEffect(() => {
@@ -20,7 +21,7 @@ export default function HomePage() {
                 const response = await fetch('/api');
                 const data = await response.json();
                 setLogFiles(data.logFiles || []);
-            
+
             } catch (error) {
                 setError('Unable to load log files');
             }
@@ -30,6 +31,8 @@ export default function HomePage() {
 
     // hanlder for fetching logs from selected file
     const handleFetchLogs = async () => {
+
+        setLoading(true);
 
         // clear error if any
         setError(null);
@@ -55,13 +58,16 @@ export default function HomePage() {
 
             const data = await response.json();
             console.log(data)
-            if (data.logs.length === 0) {setError("Log file is empty");}
+            if (data.logs.length === 0) { setError("Log file is empty"); }
             setLogs(data.logs);
 
         } catch (error) {
 
             setError(error.message);
             setLogs([]);
+
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -79,23 +85,23 @@ export default function HomePage() {
                     <ul className='list'>
                         {logFiles.length === 0 ? (
                             <p className='list-item'
-                            style={{
-                                color: 'red'
-                            }}
-                        >
-                            No log files found or directory DNE
-                        </p>
+                                style={{
+                                    color: 'red'
+                                }}
+                            >
+                                No log files found or directory DNE
+                            </p>
                         ) : (
 
-                        <>
+                            <>
 
-                        {logFiles.map((file) => (
-                            <li className="list-item" key={file}>
-                                {file}
-                            </li>
-                        ))}
+                                {logFiles.map((file) => (
+                                    <li className="list-item" key={file}>
+                                        {file}
+                                    </li>
+                                ))}
 
-                        </>
+                            </>
 
                         )}
                     </ul>
@@ -135,20 +141,28 @@ export default function HomePage() {
                         />
                     </div>
 
-                    <button className='button' disabled={logFiles.length === 0} type="submit">Fetch Logs</button>
+                    <button className='button' disabled={logFiles.length === 0 || loading === true} type="submit">Fetch Logs</button>
 
                 </form>
 
                 <div className="item">
                     <h2>Log Output:</h2>
 
-                    <pre className='logs'
-                        style={{
-                            color: error ? 'red' : 'inherit'
-                        }}
-                    >
-                        {error ? error : (logs.length > 0 && logs.join('\n'))}
-                    </pre>
+                    <div className="logs">
+
+                        {loading ? (
+                            <span className="spinner"></span>
+                        ) : (
+                            <pre
+                                style={{
+                                    color: error ? 'red' : 'inherit'
+                                }}
+                            >
+                                {error ? error : (logs.length > 0 && logs.join('\n'))}
+                            </pre>
+                        )}
+
+                    </div>
 
                 </div>
             </div>
